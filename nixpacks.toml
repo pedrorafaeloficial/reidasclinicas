@@ -1,0 +1,14 @@
+
+[variables]
+    PORT = "3020"
+    NODE_ENV = "production"
+
+[phases.setup]
+    nixPkgs = ["nodePackages.npm", "nodejs"]
+
+[phases.build]
+    dependsOn = ["setup"]
+    cmds = ["npm install", "npm run build"]
+
+[start]
+    cmd = "npm run preview -- --port 3020 --host"
