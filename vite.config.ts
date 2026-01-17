@@ -17,7 +17,11 @@ export default defineConfig(({ mode }) => {
       port: 80,
       strictPort: true,
       host: true,
-      allowedHosts: true 
+      allowedHosts: true,
+      hmr: {
+        protocol: 'ws', // Forçar WebSocket padrão (não seguro) para evitar conflitos na porta 80
+        port: 80
+      }
     },
     preview: {
       port: 80,
