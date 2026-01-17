@@ -1,19 +1,31 @@
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = 'https://vaiiopfowevcnebxksyi.supabase.co';
+/**
+ * IMPORTANTE: Para configurar no ambiente:
+ * 1. A chave (sb_publishable_...) deve estar na variável: process.env.API_KEY
+ * 2. A URL deve estar na variável: process.env.SUPABASE_URL (opcional, fallback incluído)
+ */
+const supabaseUrl = process.env.SUPABASE_URL || 'https://vaiiopfowevcnebxksyi.supabase.co';
+const rawKey = process.env.API_KEY || '';
 
 /**
- * IMPORTANTE: O erro 'Invalid API key' ocorre porque o token fornecido continha 
- * um sufixo de plataforma (sb_publishable_...) anexado ao JWT.
- * O Supabase exige apenas o JWT puro (a parte que começa com eyJ...).
+ * O erro 'Invalid API key' ocorre quando o sufixo 'sb_publishable' é enviado à API REST.
+ * Esta função isola apenas o JWT (as 3 primeiras partes separadas por ponto).
  */
-const rawKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZhaWlvcGZvd2V2Y25lYnhrc3lpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzcwMzY5MzksImV4cCI6MjA1MjYxMjkzOX0.sb_publishable_cliKdbxwxQUIlc738hON-A_eeIYn0gs';
+const cleanJwt = (key: string) => {
+  if (!key) return '';
+  const parts = key.split('.');
+  if (parts.length >= 3) {
+    // Pega a assinatura e remove qualquer texto após o padrão do token
+    const signature = parts[2].split('sb_publishable_')[0].replace(/[^a-zA-Z0-9_-]/g, '');
+    return `${parts[0]}.${parts[1]}.${signature}`;
+  }
+  return key;
+};
 
-// O JWT termina no segundo ponto. A parte 'sb_publishable_...' é um metadado da CLI/Plataforma.
-// Vamos extrair apenas as duas primeiras partes do JWT (Header.Payload.Signature)
-const cleanJwt = rawKey.split('.').slice(0, 3).join('.');
+const apiKey = cleanJwt(rawKey);
 
-export const supabase = createClient(supabaseUrl, cleanJwt, {
+export const supabase = createClient(supabaseUrl, apiKey, {
   auth: {
     persistSession: true,
     autoRefreshToken: true,
@@ -21,8 +33,8 @@ export const supabase = createClient(supabaseUrl, cleanJwt, {
   },
   global: {
     headers: {
-      'apikey': cleanJwt,
-      'Authorization': `Bearer ${cleanJwt}`
+      'apikey': apiKey,
+      'Authorization': `Bearer ${apiKey}`
     }
   }
 });
