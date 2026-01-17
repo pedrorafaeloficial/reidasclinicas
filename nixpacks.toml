@@ -11,4 +11,4 @@
     cmds = ["npm install", "npm run build"]
 
 [start]
-    cmd = "npm run preview -- --port 3020 --host"
+    cmd = "npx vite preview --port 3020 --host"
