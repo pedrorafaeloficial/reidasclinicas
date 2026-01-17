@@ -1,8 +1,11 @@
+
 import { defineConfig, loadEnv } from 'vite';
 import react from '@vitejs/plugin-react';
 
 export default defineConfig(({ mode }) => {
-  const env = loadEnv(mode, process.cwd(), '');
+  // Use a fallback for process.cwd() if types are missing
+  const cwd = typeof process !== 'undefined' && process.cwd ? process.cwd() : '';
+  const env = loadEnv(mode, cwd, '');
 
   return {
     plugins: [react()],
@@ -18,8 +21,8 @@ export default defineConfig(({ mode }) => {
       host: true,
       allowedHosts: [
         'testes-reidasclinicas.vlxcg6.easypanel.host',
-        'reidasclinicas.com.br',
-        'www.reidasclinicas.com.br'
+        'reidasclinicas.com',
+        'www.reidasclinicas.com'
       ]
     },
     preview: {
@@ -28,8 +31,8 @@ export default defineConfig(({ mode }) => {
       host: true,
       allowedHosts: [
         'testes-reidasclinicas.vlxcg6.easypanel.host',
-        'reidasclinicas.com.br',
-        'www.reidasclinicas.com.br'
+        'reidasclinicas.com',
+        'www.reidasclinicas.com'
       ]
     },
     build: {
