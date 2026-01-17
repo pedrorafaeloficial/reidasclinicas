@@ -28,7 +28,10 @@ const App: React.FC = () => {
         .order('id', { ascending: false });
 
       if (error) {
-        console.warn('Supabase fetch notice:', error.message);
+        console.error('Erro Supabase:', error.message);
+        if (error.message.includes('API key')) {
+          console.error('DICA: Verifique se a ANON_KEY no arquivo supabase.ts está correta e completa.');
+        }
         setClinics(INITIAL_CLINICS);
       } else if (data && data.length > 0) {
         const mappedData = data.map((item: any) => ({
@@ -41,7 +44,7 @@ const App: React.FC = () => {
         setClinics(INITIAL_CLINICS);
       }
     } catch (err) {
-      console.error('Unexpected error:', err);
+      console.error('Erro inesperado ao buscar clínicas:', err);
       setClinics(INITIAL_CLINICS);
     } finally {
       setLoading(false);
@@ -67,7 +70,6 @@ const App: React.FC = () => {
 
   const addClinic = async (newClinic: Omit<Clinica, 'id'>) => {
     try {
-      // Payload base para colunas garantidas
       const payload: any = {
         nome: newClinic.nome,
         localizacao: newClinic.localizacao,
@@ -78,14 +80,12 @@ const App: React.FC = () => {
         especialidades: newClinic.especialidades
       };
 
-      // Tenta incluir a coluna 'fotos' se ela existir no banco
       const { data, error } = await supabase
         .from('clinicas')
         .insert([{ ...payload, fotos: [newClinic.imagem] }])
         .select();
 
       if (error) {
-        // Se o erro for especificamente a falta da coluna fotos, tenta inserir sem ela
         if (error.message.includes('column "fotos"')) {
            const { data: retryData, error: retryError } = await supabase
             .from('clinicas')
@@ -101,8 +101,8 @@ const App: React.FC = () => {
         handleSuccess(data[0]);
       }
     } catch (err: any) {
-      console.error('Submission error:', err);
-      alert(`Erro ao salvar: ${err.message}. Certifique-se de que a foto não é excessivamente grande.`);
+      console.error('Erro ao cadastrar:', err);
+      alert(`Erro: ${err.message}`);
     }
   };
 
@@ -117,11 +117,16 @@ const App: React.FC = () => {
   };
 
   const removeClinic = async (id: string) => {
+    if (!confirm('Tem certeza que deseja remover este anúncio?')) return;
     try {
       const { error } = await supabase.from('clinicas').delete().eq('id', id);
-      if (!error) setClinics(prev => prev.filter(c => c.id !== id));
+      if (!error) {
+        setClinics(prev => prev.filter(c => c.id !== id));
+      } else {
+        alert('Erro ao deletar: ' + error.message);
+      }
     } catch (err) {
-      console.error('Deletion error:', err);
+      console.error('Erro na deleção:', err);
     }
   };
 
