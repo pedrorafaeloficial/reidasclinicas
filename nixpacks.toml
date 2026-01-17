@@ -4,11 +4,14 @@
     NODE_ENV = "production"
 
 [phases.setup]
-    nixPkgs = ["nodePackages.npm", "nodejs"]
+    nixPkgs = ["nodejs", "npm"]
+
+[phases.install]
+    cmds = ["npm install"]
 
 [phases.build]
-    dependsOn = ["setup"]
-    cmds = ["npm install", "npm run build"]
+    dependsOn = ["install"]
+    cmds = ["npm run build"]
 
 [start]
     cmd = "npx vite preview --port 3020 --host"
