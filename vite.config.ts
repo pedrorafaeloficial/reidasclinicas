@@ -7,11 +7,21 @@ export default defineConfig({
   server: {
     port: 3020,
     strictPort: true,
-    host: true
+    host: true,
+    allowedHosts: [
+      'testes-reidasclinicas.vlxcg6.easypanel.host',
+      'reidasclinicas.com.br',
+      'www.reidasclinicas.com.br'
+    ]
   },
   preview: {
     port: 3020,
     strictPort: true,
-    host: true
+    host: true,
+    allowedHosts: [
+      'testes-reidasclinicas.vlxcg6.easypanel.host',
+      'reidasclinicas.com.br',
+      'www.reidasclinicas.com.br'
+    ]
   }
 });
