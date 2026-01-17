@@ -20,46 +20,31 @@ const App: React.FC = () => {
   useEffect(() => {
     fetchClinics();
 
-    // Lógica para o Pop-up de Prova Social (Aparece e some sozinho)
     let timeoutId: number;
-
     const triggerPopup = () => {
-      // Define um número aleatório de pessoas (entre 8 e 35)
       setViewerCount(Math.floor(Math.random() * (35 - 8 + 1)) + 8);
-      
-      // Mostra o pop-up
       setShowSocialProof(true);
-
-      // Programado para sumir sozinho após 6 segundos
       timeoutId = window.setTimeout(() => {
         setShowSocialProof(false);
-        
-        // Após sumir, agenda a próxima aparição em um intervalo aleatório (entre 15 e 40 segundos)
         const nextInterval = Math.floor(Math.random() * (40000 - 15000 + 1)) + 15000;
         timeoutId = window.setTimeout(triggerPopup, nextInterval);
       }, 6000);
     };
-
-    // Inicia a primeira exibição após 4 segundos da página carregar
     timeoutId = window.setTimeout(triggerPopup, 4000);
-
-    return () => {
-      clearTimeout(timeoutId);
-    };
+    return () => clearTimeout(timeoutId);
   }, []);
 
   const fetchClinics = async () => {
-    setLoading(true);
     try {
+      setLoading(true);
       const { data, error } = await supabase
         .from('clinicas')
         .select('*')
         .order('id', { ascending: false });
 
-      if (error) {
-        console.error('Erro Supabase:', error.message);
-        setClinics(INITIAL_CLINICS);
-      } else if (data && data.length > 0) {
+      if (error) throw error;
+
+      if (data && data.length > 0) {
         const mappedData = data.map((item: any) => ({
           ...item,
           faturamentoMensal: item.faturamento_mensal || item.faturamentoMensal,
@@ -70,9 +55,11 @@ const App: React.FC = () => {
         setClinics(INITIAL_CLINICS);
       }
     } catch (err) {
-      console.error('Erro inesperado ao buscar clínicas:', err);
+      console.error('Erro na conexão com Supabase:', err);
+      // Se der erro, usamos os dados iniciais para o site não ficar em branco
       setClinics(INITIAL_CLINICS);
     } finally {
+      // Garantimos que o loading saia independente de erro
       setLoading(false);
     }
   };
@@ -111,24 +98,10 @@ const App: React.FC = () => {
         .insert([{ ...payload, fotos: [newClinic.imagem] }])
         .select();
 
-      if (error) {
-        if (error.message.includes('column "fotos"')) {
-           const { data: retryData, error: retryError } = await supabase
-            .from('clinicas')
-            .insert([payload])
-            .select();
-            
-           if (retryError) throw retryError;
-           if (retryData) handleSuccess(retryData[0]);
-        } else {
-          throw error;
-        }
-      } else if (data) {
-        handleSuccess(data[0]);
-      }
+      if (error) throw error;
+      if (data) handleSuccess(data[0]);
     } catch (err: any) {
-      console.error('Erro ao cadastrar:', err);
-      alert(`Erro: ${err.message}`);
+      alert(`Erro ao salvar: Verifique sua conexão. (${err.message})`);
     }
   };
 
@@ -158,7 +131,7 @@ const App: React.FC = () => {
 
   return (
     <div className="min-h-screen flex flex-col relative">
-      {/* Pop-up de Prova Social que aparece e some sozinho */}
+      {/* Pop-up de Prova Social */}
       <div className={`fixed bottom-6 left-6 z-[100] transition-all duration-700 transform ${showSocialProof ? 'translate-y-0 opacity-100' : 'translate-y-12 opacity-0 pointer-events-none'}`}>
         <div className="bg-white/95 backdrop-blur-md border border-blue-100 shadow-[0_20px_50px_rgba(0,0,0,0.15)] rounded-2xl p-4 flex items-center space-x-4 max-w-xs">
           <div className="relative">
@@ -176,9 +149,6 @@ const App: React.FC = () => {
             </p>
             <p className="text-slate-400 text-[10px] uppercase font-bold tracking-widest mt-1">Alta procura agora!</p>
           </div>
-          <button onClick={() => setShowSocialProof(false)} className="text-slate-300 hover:text-slate-500 p-1">
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
-          </button>
         </div>
       </div>
 
@@ -190,17 +160,20 @@ const App: React.FC = () => {
       />
       
       <main className="flex-grow">
+        {loading && (
+          <div className="fixed inset-0 bg-white/50 z-50 flex items-center justify-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-b-4 border-blue-600"></div>
+          </div>
+        )}
         {currentPage === 'home' && <LandingPage onStartBrowsing={() => navigate('catalog')} />}
         {currentPage === 'catalog' && (
-          <div className={loading ? "opacity-50 pointer-events-none" : ""}>
-            <CatalogPage 
-              isAdmin={isAdmin} 
-              clinics={clinics} 
-              onAddClinic={addClinic}
-              onRemoveClinic={removeClinic}
-              onViewDossier={openDossier}
-            />
-          </div>
+          <CatalogPage 
+            isAdmin={isAdmin} 
+            clinics={clinics} 
+            onAddClinic={addClinic}
+            onRemoveClinic={removeClinic}
+            onViewDossier={openDossier}
+          />
         )}
         {currentPage === 'dossier' && selectedClinic && (
           <DossierPage 
@@ -225,7 +198,6 @@ const App: React.FC = () => {
             <ul className="space-y-2 text-sm">
               <li><button onClick={() => navigate('home')}>Início</button></li>
               <li><button onClick={() => navigate('catalog')}>Ver Clínicas</button></li>
-              <li><a href="#" className="hover:text-white transition-colors">Privacidade</a></li>
             </ul>
           </div>
           <div>
