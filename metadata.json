@@ -1,0 +1,9 @@
+{
+  "name": "Rei das Clínicas",
+  "description": "A maior plataforma de intermediação e venda de clínicas do Brasil, oferecendo as melhores negociações e segurança para compradores e vendedores.",
+  "requestFramePermissions": [],
+  "build": {
+    "command": "npm run build",
+    "output": "dist"
+  }
+}
