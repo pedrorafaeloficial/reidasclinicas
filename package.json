@@ -11,9 +11,10 @@
     "start": "vite preview --port 3020 --host"
   },
   "dependencies": {
-    "react": "^19.2.3",
-    "react-dom": "^19.2.3",
-    "@supabase/supabase-js": "2.39.7"
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "@supabase/supabase-js": "2.39.7",
+    "lucide-react": "^0.473.0"
   },
   "devDependencies": {
     "@types/react": "^19.0.0",

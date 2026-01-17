@@ -23,5 +23,13 @@ export default defineConfig({
       'reidasclinicas.com.br',
       'www.reidasclinicas.com.br'
     ]
+  },
+  build: {
+    outDir: 'dist',
+    rollupOptions: {
+      input: {
+        main: './index.html'
+      }
+    }
   }
 });
