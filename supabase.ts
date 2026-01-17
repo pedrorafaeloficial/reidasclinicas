@@ -1,13 +1,25 @@
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = 'https://vaiiopfowevcnebxksyi.supabase.co';
+// Função para limpar strings de ambiente que podem vir com aspas ou espaços
+const cleanEnvVar = (val: any): string => {
+  if (typeof val !== 'string') return '';
+  return val.replace(/^["'](.+)["']$/, '$1').trim();
+};
 
-// Graças à configuração do Vite, process.env.API_KEY será substituído pelo valor real
-// no momento da construção do projeto.
-const apiKey = process.env.API_KEY;
+const supabaseUrl = cleanEnvVar(
+  import.meta.env?.VITE_SUPABASE_URL || 
+  (window as any).VITE_SUPABASE_URL || 
+  'https://vaiiopfowevcnebxksyi.supabase.co'
+);
 
-if (!apiKey) {
-  console.error("ERRO CRÍTICO: API_KEY não encontrada. Verifique as variáveis de ambiente.");
+const supabaseKey = cleanEnvVar(
+  import.meta.env?.VITE_SUPABASE_ANON_KEY || 
+  (window as any).VITE_SUPABASE_ANON_KEY || 
+  'sb_publishable_vx5kEGJnpbueVBvfOA3DQA_7LB2pQl-'
+);
+
+if (!supabaseKey || supabaseKey === 'undefined') {
+  console.error("ERRO: Chave do Supabase não encontrada.");
 }
 
-export const supabase = createClient(supabaseUrl, apiKey || '');
+export const supabase = createClient(supabaseUrl, supabaseKey);
