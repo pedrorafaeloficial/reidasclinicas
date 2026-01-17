@@ -6,6 +6,6 @@
     "command": "npm install && npm run build",
     "output": "dist",
     "port": 3020,
-    "startCommand": "npx vite preview --port 3020 --host"
+    "startCommand": "npm start"
   }
 }
