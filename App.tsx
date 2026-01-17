@@ -14,9 +14,38 @@ const App: React.FC = () => {
   const [selectedClinic, setSelectedClinic] = useState<Clinica | null>(null);
   const [clinics, setClinics] = useState<Clinica[]>([]);
   const [loading, setLoading] = useState(true);
+  const [showSocialProof, setShowSocialProof] = useState(false);
+  const [viewerCount, setViewerCount] = useState(12);
 
   useEffect(() => {
     fetchClinics();
+
+    // Lógica para o Pop-up de Prova Social (Aparece e some sozinho)
+    let timeoutId: number;
+
+    const triggerPopup = () => {
+      // Define um número aleatório de pessoas (entre 8 e 35)
+      setViewerCount(Math.floor(Math.random() * (35 - 8 + 1)) + 8);
+      
+      // Mostra o pop-up
+      setShowSocialProof(true);
+
+      // Programado para sumir sozinho após 6 segundos
+      timeoutId = window.setTimeout(() => {
+        setShowSocialProof(false);
+        
+        // Após sumir, agenda a próxima aparição em um intervalo aleatório (entre 15 e 40 segundos)
+        const nextInterval = Math.floor(Math.random() * (40000 - 15000 + 1)) + 15000;
+        timeoutId = window.setTimeout(triggerPopup, nextInterval);
+      }, 6000);
+    };
+
+    // Inicia a primeira exibição após 4 segundos da página carregar
+    timeoutId = window.setTimeout(triggerPopup, 4000);
+
+    return () => {
+      clearTimeout(timeoutId);
+    };
   }, []);
 
   const fetchClinics = async () => {
@@ -29,9 +58,6 @@ const App: React.FC = () => {
 
       if (error) {
         console.error('Erro Supabase:', error.message);
-        if (error.message.includes('API key')) {
-          console.error('DICA: Verifique se a ANON_KEY no arquivo supabase.ts está correta e completa.');
-        }
         setClinics(INITIAL_CLINICS);
       } else if (data && data.length > 0) {
         const mappedData = data.map((item: any) => ({
@@ -131,7 +157,31 @@ const App: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col relative">
+      {/* Pop-up de Prova Social que aparece e some sozinho */}
+      <div className={`fixed bottom-6 left-6 z-[100] transition-all duration-700 transform ${showSocialProof ? 'translate-y-0 opacity-100' : 'translate-y-12 opacity-0 pointer-events-none'}`}>
+        <div className="bg-white/95 backdrop-blur-md border border-blue-100 shadow-[0_20px_50px_rgba(0,0,0,0.15)] rounded-2xl p-4 flex items-center space-x-4 max-w-xs">
+          <div className="relative">
+            <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center text-white shadow-lg shadow-blue-200">
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+            </div>
+            <span className="absolute -top-1 -right-1 flex h-3 w-3">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
+            </span>
+          </div>
+          <div>
+            <p className="text-[#0f172a] text-sm font-black tracking-tight leading-tight">
+              <span className="text-[#2563eb]">{viewerCount} pessoas</span> estão olhando clínicas nesse momento.
+            </p>
+            <p className="text-slate-400 text-[10px] uppercase font-bold tracking-widest mt-1">Alta procura agora!</p>
+          </div>
+          <button onClick={() => setShowSocialProof(false)} className="text-slate-300 hover:text-slate-500 p-1">
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
+          </button>
+        </div>
+      </div>
+
       <Navbar 
         isAdmin={isAdmin} 
         onAdminLogin={setIsAdmin} 

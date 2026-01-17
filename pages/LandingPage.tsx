@@ -6,6 +6,19 @@ interface LandingPageProps {
   onStartBrowsing: () => void;
 }
 
+const SOLD_CLINICS = [
+  "Clínica Odonto Prime - SP (VENDIDA)",
+  "Centro Médico Alpha - RJ (VENDIDA)",
+  "Estética Vitality - PR (VENDIDA)",
+  "Hospital São Lucas (Lote 4) - MG (VENDIDA)",
+  "Dermatologia Pelle - SC (VENDIDA)",
+  "Ginecologia Femina - DF (VENDIDA)",
+  "Clínica Vet Amigo - RS (VENDIDA)",
+  "Ortopedia Movimento - GO (VENDIDA)",
+  "Cardio Care - ES (VENDIDA)",
+  "Oftalmo Vision - BA (VENDIDA)"
+];
+
 export const LandingPage: React.FC<LandingPageProps> = ({ onStartBrowsing }) => {
   const handleWhatsApp = () => {
     window.open(`https://wa.me/55${CONTACT_WHATSAPP}?text=${WHATSAPP_MESSAGE}`, '_blank');
@@ -24,7 +37,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStartBrowsing }) => 
               Conquiste sua Tão sonhada <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#2563eb] to-blue-400">Clínica Lucrativa!</span>
             </h1>
             <p className="text-xl text-slate-600 mb-10 leading-relaxed max-w-2xl mx-auto font-light">
-              Não compre apenas um imóvel, compre um negócio faturando. O Rei das Clínicas é a sua ponte segura para o sucesso no setor de saúde.
+              Não compre apenas um imóvel, compre um negócio faturando. O Rei das Clínicas é a sua ponte segura para o success no setor de saúde.
             </p>
             <div className="flex flex-col sm:flex-row justify-center gap-4">
               <button 
@@ -71,6 +84,38 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStartBrowsing }) => 
              </div>
           </div>
         </div>
+      </section>
+
+      {/* Carrossel Infinito de Clínicas Vendidas */}
+      <section className="py-8 bg-[#0f172a] border-y border-slate-800 overflow-hidden relative">
+        <div className="absolute left-0 top-0 bottom-0 w-20 lg:w-40 bg-gradient-to-r from-[#0f172a] to-transparent z-10"></div>
+        <div className="absolute right-0 top-0 bottom-0 w-20 lg:w-40 bg-gradient-to-l from-[#0f172a] to-transparent z-10"></div>
+        
+        <div className="flex whitespace-nowrap animate-scroll">
+          {/* Duplicamos a lista para criar o efeito infinito suave */}
+          {[...SOLD_CLINICS, ...SOLD_CLINICS, ...SOLD_CLINICS].map((name, idx) => (
+            <div key={idx} className="inline-flex items-center mx-8 group">
+              <span className="w-2 h-2 rounded-full bg-[#2563eb] mr-4"></span>
+              <span className="text-white/60 font-black text-xs lg:text-sm uppercase tracking-[0.3em] group-hover:text-white transition-colors cursor-default">
+                {name}
+              </span>
+            </div>
+          ))}
+        </div>
+
+        <style>{`
+          @keyframes scroll {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-33.33%); }
+          }
+          .animate-scroll {
+            /* Velocidade 50% mais rápida que o anterior (de 20s para 10s) */
+            animation: scroll 10s linear infinite;
+          }
+          .animate-scroll:hover {
+            animation-play-state: paused;
+          }
+        `}</style>
       </section>
 
       <section className="py-24 bg-slate-50 border-y border-slate-200">

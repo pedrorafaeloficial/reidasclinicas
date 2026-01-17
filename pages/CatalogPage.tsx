@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+
+import React, { useState, useMemo } from 'react';
 import { Clinica } from '../types';
 import { CONTACT_WHATSAPP } from '../constants';
 
@@ -11,7 +12,7 @@ interface CatalogPageProps {
 }
 
 const ESTADOS_BRASIL = [
-  "AC", "AL", "AP", "AM", "BA", "CE", "DF", "ES", "GO", "MA", "MT", "MS", "MG", 
+  "Todos", "AC", "AL", "AP", "AM", "BA", "CE", "DF", "ES", "GO", "MA", "MT", "MS", "MG", 
   "PA", "PB", "PR", "PE", "PI", "RJ", "RN", "RS", "RO", "RR", "SC", "SP", "SE", "TO"
 ];
 
@@ -46,6 +47,11 @@ const compressImage = (base64: string, maxWidth = 800, quality = 0.7): Promise<s
 export const CatalogPage: React.FC<CatalogPageProps> = ({ isAdmin, clinics, onAddClinic, onRemoveClinic, onViewDossier }) => {
   const [showAddModal, setShowAddModal] = useState(false);
   const [uploading, setUploading] = useState(false);
+  
+  // Estados de Filtro
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedUF, setSelectedUF] = useState('Todos');
+  
   const [formData, setFormData] = useState({
     nome: '',
     estado: 'SP',
@@ -57,6 +63,16 @@ export const CatalogPage: React.FC<CatalogPageProps> = ({ isAdmin, clinics, onAd
     novaEspecialidade: '',
     imagemBase64: ''
   });
+
+  // Lógica de filtragem memoizada
+  const filteredClinics = useMemo(() => {
+    return clinics.filter(clinic => {
+      const matchesSearch = clinic.nome.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                            clinic.localizacao.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesUF = selectedUF === 'Todos' || clinic.localizacao.includes(`, ${selectedUF}`);
+      return matchesSearch && matchesUF;
+    });
+  }, [clinics, searchTerm, selectedUF]);
 
   const handleInterest = (nomeClinica: string) => {
     const text = encodeURIComponent(`Olá tenho interesse na clinica ${nomeClinica}`);
@@ -133,29 +149,54 @@ export const CatalogPage: React.FC<CatalogPageProps> = ({ isAdmin, clinics, onAd
 
   return (
     <div className="py-12 px-4 max-w-7xl mx-auto animate-in slide-in-from-bottom-4 duration-500">
-      <div className="flex flex-col md:flex-row md:items-center justify-between mb-12">
+      <div className="flex flex-col lg:flex-row lg:items-end justify-between mb-12 gap-8">
         <div>
           <h1 className="text-5xl font-black text-[#0f172a] tracking-tight leading-none">Oportunidades do Rei</h1>
           <p className="text-slate-500 mt-3 font-medium text-lg">As melhores clínicas selecionadas a dedo pelo Brasil.</p>
         </div>
         
-        {isAdmin && (
-          <button 
-            onClick={() => setShowAddModal(true)}
-            className="mt-4 md:mt-0 bg-[#2563eb] text-white px-8 py-4 rounded-[1.5rem] font-black text-sm uppercase tracking-widest hover:bg-[#1d4ed8] transition-all flex items-center shadow-2xl shadow-blue-100 active:scale-95"
+        {/* Barra de Filtros */}
+        <div className="flex flex-col md:flex-row gap-4 flex-grow max-w-3xl">
+          <div className="relative flex-grow">
+            <input 
+              type="text"
+              placeholder="Buscar por nome ou cidade..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full pl-12 pr-6 py-4 rounded-2xl border-2 border-slate-100 focus:border-[#2563eb] focus:outline-none bg-white transition-all text-slate-700 font-bold shadow-sm"
+            />
+            <svg className="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+          </div>
+          
+          <select 
+            value={selectedUF}
+            onChange={(e) => setSelectedUF(e.target.value)}
+            className="md:w-32 px-4 py-4 rounded-2xl border-2 border-slate-100 focus:border-[#2563eb] focus:outline-none bg-white transition-all text-slate-700 font-bold shadow-sm appearance-none"
           >
-            <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" /></svg>
-            CADASTRAR CLÍNICA
-          </button>
-        )}
+            {ESTADOS_BRASIL.map(uf => <option key={uf} value={uf}>{uf === 'Todos' ? 'Brasil (UF)' : uf}</option>)}
+          </select>
+
+          {isAdmin && (
+            <button 
+              onClick={() => setShowAddModal(true)}
+              className="bg-[#2563eb] text-white px-8 py-4 rounded-2xl font-black text-sm uppercase tracking-widest hover:bg-[#1d4ed8] transition-all flex items-center shadow-2xl shadow-blue-100 active:scale-95 whitespace-nowrap"
+            >
+              <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" /></svg>
+              CADASTRAR
+            </button>
+          )}
+        </div>
       </div>
 
+      {/* Resultados da Busca */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
-        {clinics.length === 0 ? (
-          <div className="col-span-full py-20 text-center">
-            <p className="text-slate-400 text-xl font-medium italic">O Rei está garimpando novas clínicas para você...</p>
+        {filteredClinics.length === 0 ? (
+          <div className="col-span-full py-20 text-center bg-white rounded-[3rem] border-2 border-dashed border-slate-100">
+            <svg className="w-16 h-16 mx-auto text-slate-200 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9.172 9.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+            <p className="text-slate-400 text-xl font-medium italic">Nenhuma clínica encontrada para esta busca...</p>
+            <button onClick={() => {setSearchTerm(''); setSelectedUF('Todos');}} className="mt-4 text-[#2563eb] font-bold underline">Limpar filtros</button>
           </div>
-        ) : clinics.map((clinic) => (
+        ) : filteredClinics.map((clinic) => (
           <div key={clinic.id} className="group bg-white rounded-[3rem] border-2 border-slate-100 overflow-hidden hover:border-blue-100 hover:shadow-[0_40px_80px_-20px_rgba(0,0,0,0.1)] transition-all flex flex-col h-full">
             <div className="relative h-64 overflow-hidden">
                <img 
@@ -262,7 +303,7 @@ export const CatalogPage: React.FC<CatalogPageProps> = ({ isAdmin, clinics, onAd
                   <div>
                     <label className="block text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] mb-3 ml-1">Estado (UF)</label>
                     <select required value={formData.estado} onChange={e => setFormData({...formData, estado: e.target.value})} className="w-full px-6 py-5 rounded-2xl border-2 border-slate-100 focus:border-[#2563eb] focus:outline-none bg-white transition-all text-slate-700 font-bold appearance-none shadow-sm">
-                      {ESTADOS_BRASIL.map(uf => <option key={uf} value={uf}>{uf}</option>)}
+                      {ESTADOS_BRASIL.slice(1).map(uf => <option key={uf} value={uf}>{uf}</option>)}
                     </select>
                   </div>
                   <div>
