@@ -34,7 +34,6 @@ const App: React.FC = () => {
         const mappedData = data.map((item: any) => ({
           ...item,
           faturamentoMensal: item.faturamento_mensal || item.faturamentoMensal,
-          // Garante que fotos seja sempre um array, mesmo que a coluna não exista ou venha nula
           fotos: Array.isArray(item.fotos) ? item.fotos : [item.imagem]
         }));
         setClinics(mappedData);
@@ -68,36 +67,53 @@ const App: React.FC = () => {
 
   const addClinic = async (newClinic: Omit<Clinica, 'id'>) => {
     try {
-      const payload = {
+      // Payload base para colunas garantidas
+      const payload: any = {
         nome: newClinic.nome,
         localizacao: newClinic.localizacao,
         preco: newClinic.preco,
         faturamento_mensal: newClinic.faturamentoMensal,
         descricao: newClinic.descricao,
         imagem: newClinic.imagem,
-        especialidades: newClinic.especialidades,
-        fotos: [newClinic.imagem] // Inicia a galeria com a foto principal
+        especialidades: newClinic.especialidades
       };
 
+      // Tenta incluir a coluna 'fotos' se ela existir no banco
       const { data, error } = await supabase
         .from('clinicas')
-        .insert([payload])
+        .insert([{ ...payload, fotos: [newClinic.imagem] }])
         .select();
 
       if (error) {
-        alert(`Erro ao salvar: ${error.message}. Verifique se a coluna 'fotos' foi criada no Supabase.`);
+        // Se o erro for especificamente a falta da coluna fotos, tenta inserir sem ela
+        if (error.message.includes('column "fotos"')) {
+           const { data: retryData, error: retryError } = await supabase
+            .from('clinicas')
+            .insert([payload])
+            .select();
+            
+           if (retryError) throw retryError;
+           if (retryData) handleSuccess(retryData[0]);
+        } else {
+          throw error;
+        }
       } else if (data) {
-        const savedClinic = { 
-          ...data[0], 
-          faturamentoMensal: data[0].faturamento_mensal,
-          fotos: data[0].fotos || [data[0].imagem]
-        };
-        setClinics(prev => [savedClinic, ...prev]);
-        alert('Clínica cadastrada com sucesso!');
+        handleSuccess(data[0]);
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error('Submission error:', err);
+      alert(`Erro ao salvar: ${err.message}. Certifique-se de que a foto não é excessivamente grande.`);
     }
+  };
+
+  const handleSuccess = (savedItem: any) => {
+    const savedClinic = { 
+      ...savedItem, 
+      faturamentoMensal: savedItem.faturamento_mensal,
+      fotos: savedItem.fotos || [savedItem.imagem]
+    };
+    setClinics(prev => [savedClinic, ...prev]);
+    alert('Clínica cadastrada com sucesso!');
   };
 
   const removeClinic = async (id: string) => {

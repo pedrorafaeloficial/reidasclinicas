@@ -21,6 +21,28 @@ const ESPECIALIDADES_SUGERIDAS = [
   "Veterinária", "Laboratório", "Hospital", "Pronto Socorro"
 ];
 
+const compressImage = (base64: string, maxWidth = 800, quality = 0.7): Promise<string> => {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.src = base64;
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      let width = img.width;
+      let height = img.height;
+      if (width > maxWidth) {
+        height = Math.round((height * maxWidth) / width);
+        width = maxWidth;
+      }
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext('2d');
+      ctx?.drawImage(img, 0, 0, width, height);
+      resolve(canvas.toDataURL('image/jpeg', quality));
+    };
+    img.onerror = () => resolve(base64);
+  });
+};
+
 export const CatalogPage: React.FC<CatalogPageProps> = ({ isAdmin, clinics, onAddClinic, onRemoveClinic, onViewDossier }) => {
   const [showAddModal, setShowAddModal] = useState(false);
   const [uploading, setUploading] = useState(false);
@@ -56,8 +78,9 @@ export const CatalogPage: React.FC<CatalogPageProps> = ({ isAdmin, clinics, onAd
     const file = e.target.files?.[0];
     if (file) {
       const reader = new FileReader();
-      reader.onloadend = () => {
-        setFormData(prev => ({ ...prev, imagemBase64: reader.result as string }));
+      reader.onloadend = async () => {
+        const compressed = await compressImage(reader.result as string);
+        setFormData(prev => ({ ...prev, imagemBase64: compressed }));
       };
       reader.readAsDataURL(file);
     }
@@ -97,7 +120,7 @@ export const CatalogPage: React.FC<CatalogPageProps> = ({ isAdmin, clinics, onAd
       especialidades: formData.especialidades.length > 0 ? formData.especialidades : ["Geral"]
     };
     
-    onAddClinic(newClinic);
+    await onAddClinic(newClinic);
     setUploading(false);
     setShowAddModal(false);
     setFormData({ nome: '', estado: 'SP', cidade: '', preco: '', faturamentoMensal: '', descricao: '', especialidades: [], novaEspecialidade: '', imagemBase64: '' });
@@ -260,8 +283,13 @@ export const CatalogPage: React.FC<CatalogPageProps> = ({ isAdmin, clinics, onAd
                   </div>
                 </div>
 
-                <button type="submit" disabled={uploading} className="w-full bg-[#2563eb] text-white py-6 rounded-3xl font-black text-xl hover:bg-[#1d4ed8] transition-all shadow-2xl shadow-blue-100 mt-6 active:scale-95 uppercase tracking-widest disabled:opacity-50">
-                  {uploading ? 'ENVIANDO...' : 'PUBLICAR ANÚNCIO AGORA'}
+                <button type="submit" disabled={uploading} className="w-full bg-[#2563eb] text-white py-6 rounded-3xl font-black text-xl hover:bg-[#1d4ed8] transition-all shadow-2xl shadow-blue-100 mt-6 active:scale-95 uppercase tracking-widest disabled:opacity-50 flex items-center justify-center">
+                  {uploading ? (
+                    <>
+                      <svg className="animate-spin h-6 w-6 mr-3 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                      PROCESSANDO...
+                    </>
+                  ) : 'PUBLICAR ANÚNCIO AGORA'}
                 </button>
               </form>
             </div>
