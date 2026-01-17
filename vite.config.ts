@@ -14,20 +14,20 @@ export default defineConfig(({ mode }) => {
       'window.VITE_SUPABASE_ANON_KEY': JSON.stringify(env.SUPABASE_ANON_KEY || env.VITE_SUPABASE_ANON_KEY),
     },
     server: {
-      port: 3020,
+      port: 80,
       strictPort: true,
       host: true,
-      allowedHosts: true // Permitir todos os hosts no modo dev/preview para evitar bloqueios de rede local
+      allowedHosts: true 
     },
     preview: {
-      port: 3020,
+      port: 80,
       strictPort: true,
       host: true,
-      allowedHosts: true // Garante que em produção o host não seja bloqueado por headers inválidos
+      allowedHosts: true 
     },
     build: {
       outDir: 'dist',
-      sourcemap: false, // Desabilitar sourcemaps para produção (performance e segurança)
+      sourcemap: false,
       rollupOptions: {
         input: {
           main: './index.html'

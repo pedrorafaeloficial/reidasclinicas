@@ -5,7 +5,7 @@
   "build": {
     "command": "npm install && npm run build",
     "output": "dist",
-    "port": 3020,
+    "port": 80,
     "startCommand": "npm run start"
   }
 }
