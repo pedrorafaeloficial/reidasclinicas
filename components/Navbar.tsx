@@ -91,7 +91,7 @@ export const Navbar: React.FC<NavbarProps> = ({ isAdmin, onAdminLogin, currentPa
               </button>
             </div>
 
-            {/* Centro: Logo (Ajustado para Mobile) */}
+            {/* Centro: Logo */}
             <div className="flex justify-center flex-1">
               <div 
                 className="h-12 lg:h-24 w-auto flex items-center justify-center cursor-pointer transition-transform hover:scale-105" 
@@ -101,6 +101,9 @@ export const Navbar: React.FC<NavbarProps> = ({ isAdmin, onAdminLogin, currentPa
                     src="/assets/images/Logo.png" 
                     alt="Rei das Clínicas Logo" 
                     className="h-full w-full object-contain"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).src = 'https://agenciafoxon.com.br/wp-content/uploads/2026/01/Captura-de-tela-2026-01-16-234639.png';
+                    }}
                  />
               </div>
             </div>
@@ -137,7 +140,7 @@ export const Navbar: React.FC<NavbarProps> = ({ isAdmin, onAdminLogin, currentPa
           </div>
         </div>
 
-        {/* Mobile: Menu Dropdown */}
+        {/* Mobile Menu Dropdown */}
         {isMenuOpen && (
           <div className="lg:hidden bg-white border-t border-slate-100 animate-in slide-in-from-top duration-300">
             <div className="px-4 pt-4 pb-6 space-y-4">
@@ -174,20 +177,27 @@ export const Navbar: React.FC<NavbarProps> = ({ isAdmin, onAdminLogin, currentPa
       </nav>
 
       {showLoginModal && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 overflow-y-auto bg-slate-900/80 backdrop-blur-md animate-in fade-in duration-300">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-md animate-in fade-in duration-300">
           <div 
             className="fixed inset-0 cursor-pointer"
             onClick={() => setShowLoginModal(false)}
           ></div>
           
-          <div className="relative bg-white rounded-[2.5rem] lg:rounded-[3rem] w-full max-w-md shadow-[0_35px_60px_-15px_rgba(0,0,0,0.5)] overflow-hidden animate-in zoom-in-95 duration-300 my-auto">
-            <div className="p-8 lg:p-14">
+          <div className="relative bg-white rounded-[2.5rem] w-full max-w-md shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300">
+            <div className="p-8 lg:p-12">
               <div className="flex justify-between items-start mb-8">
                 <div className="flex items-center">
-                    <img src="/assets/images/Logo.png" alt="Logo" className="h-8 lg:h-10 w-auto mr-3" />
+                    <img 
+                      src="/assets/images/Logo.png" 
+                      alt="Logo" 
+                      className="h-10 w-auto mr-3"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).src = 'https://agenciafoxon.com.br/wp-content/uploads/2026/01/Captura-de-tela-2026-01-16-234639.png';
+                      }}
+                    />
                     <div>
-                        <h2 className="text-xl lg:text-2xl font-black text-[#0f172a] tracking-tight">Acesso Restrito</h2>
-                        <p className="text-slate-500 text-[10px] mt-1">Identifique-se para gerenciar anúncios.</p>
+                        <h2 className="text-xl font-black text-[#0f172a] tracking-tight">Acesso Administrativo</h2>
+                        <p className="text-slate-500 text-[10px] mt-1 uppercase tracking-wider font-bold">Painel de Controle</p>
                     </div>
                 </div>
                 <button 
@@ -202,37 +212,37 @@ export const Navbar: React.FC<NavbarProps> = ({ isAdmin, onAdminLogin, currentPa
               
               <form onSubmit={handleLogin} className="space-y-4 lg:space-y-6">
                 <div>
-                  <label className="block text-[9px] font-black text-slate-400 uppercase tracking-[0.2em] mb-2 ml-1">E-mail Administrativo</label>
+                  <label className="block text-[9px] font-black text-slate-400 uppercase tracking-[0.2em] mb-2 ml-1">E-mail</label>
                   <input 
                     type="email" 
                     required 
                     value={email} 
                     onChange={e => setEmail(e.target.value)} 
-                    className="w-full px-5 py-4 lg:px-6 lg:py-5 rounded-xl lg:rounded-2xl border-2 border-slate-100 focus:border-[#2563eb] focus:outline-none transition-all placeholder:text-slate-200 font-bold text-base lg:text-lg shadow-sm bg-white"
-                    placeholder="exemplo@reidasclinicas.com"
+                    className="w-full px-6 py-4 rounded-xl border-2 border-slate-100 focus:border-[#2563eb] focus:outline-none transition-all font-bold"
+                    placeholder="admin@reidasclinicas.com"
                   />
                 </div>
                 <div>
-                  <label className="block text-[9px] font-black text-slate-400 uppercase tracking-[0.2em] mb-2 ml-1">Chave de Segurança</label>
+                  <label className="block text-[9px] font-black text-slate-400 uppercase tracking-[0.2em] mb-2 ml-1">Senha</label>
                   <input 
                     type="password" 
                     required 
                     value={password} 
                     onChange={e => setPassword(e.target.value)} 
-                    className="w-full px-5 py-4 lg:px-6 lg:py-5 rounded-xl lg:rounded-2xl border-2 border-slate-100 focus:border-[#2563eb] focus:outline-none transition-all placeholder:text-slate-200 font-bold text-base lg:text-lg shadow-sm bg-white"
+                    className="w-full px-6 py-4 rounded-xl border-2 border-slate-100 focus:border-[#2563eb] focus:outline-none transition-all font-bold"
                     placeholder="••••••••"
                   />
                 </div>
                 <button 
                   disabled={loading}
                   type="submit" 
-                  className="w-full bg-[#0f172a] text-white py-5 lg:py-6 rounded-xl lg:rounded-2xl font-black text-base lg:text-lg hover:bg-[#2563eb] transition-all shadow-2xl flex items-center justify-center space-x-3 active:scale-[0.97] mt-4"
+                  className="w-full bg-[#0f172a] text-white py-5 rounded-xl font-black text-sm hover:bg-[#2563eb] transition-all shadow-xl flex items-center justify-center space-x-3 active:scale-[0.97]"
                 >
                   {loading ? (
-                    <svg className="animate-spin h-6 w-6 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                    <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
                   ) : (
                     <>
-                      <span>ENTRAR AGORA</span>
+                      <span>ENTRAR NO SISTEMA</span>
                       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 7l5 5m0 0l-5 5m5-5H6" /></svg>
                     </>
                   )}
