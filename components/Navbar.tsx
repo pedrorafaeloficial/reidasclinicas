@@ -17,6 +17,9 @@ export const Navbar: React.FC<NavbarProps> = ({ isAdmin, onAdminLogin, currentPa
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
 
+  // Caminho absoluto com timestamp para evitar cache do navegador se o arquivo foi substituído recentemente
+  const logoUrl = "/assets/images/Logo.png?v=1.0";
+
   const handleWhatsApp = (msg?: string) => {
     const text = msg ? encodeURIComponent(msg) : WHATSAPP_MESSAGE;
     window.open(`https://wa.me/55${CONTACT_WHATSAPP}?text=${text}`, '_blank');
@@ -98,9 +101,10 @@ export const Navbar: React.FC<NavbarProps> = ({ isAdmin, onAdminLogin, currentPa
                 onClick={() => onNavigate('home')}
               >
                  <img 
-                    src="/assets/images/Logo.png" 
-                    alt="Rei das Clínicas Logo" 
-                    className="h-full w-full object-contain"
+                    src={logoUrl}
+                    alt="Rei das Clínicas" 
+                    className="h-full w-auto max-w-[200px] lg:max-w-[300px] object-contain"
+                    style={{ display: 'block' }}
                  />
               </div>
             </div>
@@ -185,9 +189,9 @@ export const Navbar: React.FC<NavbarProps> = ({ isAdmin, onAdminLogin, currentPa
               <div className="flex justify-between items-start mb-8">
                 <div className="flex items-center">
                     <img 
-                      src="/assets/images/Logo.png" 
+                      src={logoUrl}
                       alt="Logo" 
-                      className="h-10 w-auto mr-3"
+                      className="h-10 w-auto mr-3 object-contain"
                     />
                     <div>
                         <h2 className="text-xl font-black text-[#0f172a] tracking-tight">Acesso Administrativo</h2>
@@ -198,9 +202,7 @@ export const Navbar: React.FC<NavbarProps> = ({ isAdmin, onAdminLogin, currentPa
                   onClick={() => setShowLoginModal(false)} 
                   className="bg-slate-100 p-2 rounded-full text-slate-400 hover:text-rose-500 transition-all"
                 >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-                  </svg>
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
                 </button>
               </div>
               
