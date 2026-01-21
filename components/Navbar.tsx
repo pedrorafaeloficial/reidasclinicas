@@ -98,7 +98,7 @@ export const Navbar: React.FC<NavbarProps> = ({ isAdmin, onAdminLogin, currentPa
                 onClick={() => onNavigate('home')}
               >
                  <img 
-                    src="https://agenciafoxon.com.br/wp-content/uploads/2026/01/Captura-de-tela-2026-01-16-234639.png" 
+                    src="/assets/images/Logo.png" 
                     alt="Rei das Clínicas Logo" 
                     className="h-full w-full object-contain"
                  />
@@ -184,7 +184,7 @@ export const Navbar: React.FC<NavbarProps> = ({ isAdmin, onAdminLogin, currentPa
             <div className="p-8 lg:p-14">
               <div className="flex justify-between items-start mb-8">
                 <div className="flex items-center">
-                    <img src="https://agenciafoxon.com.br/wp-content/uploads/2026/01/Captura-de-tela-2026-01-16-234639.png" alt="Logo" className="h-8 lg:h-10 w-auto mr-3" />
+                    <img src="/assets/images/Logo.png" alt="Logo" className="h-8 lg:h-10 w-auto mr-3" />
                     <div>
                         <h2 className="text-xl lg:text-2xl font-black text-[#0f172a] tracking-tight">Acesso Restrito</h2>
                         <p className="text-slate-500 text-[10px] mt-1">Identifique-se para gerenciar anúncios.</p>
