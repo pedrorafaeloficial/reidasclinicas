@@ -13,7 +13,6 @@ const App: React.FC = () => {
   const [currentPage, setCurrentPage] = useState<'home' | 'catalog' | 'dossier'>('home');
   const [selectedClinic, setSelectedClinic] = useState<Clinica | null>(null);
   const [clinics, setClinics] = useState<Clinica[]>([]);
-  const [loading, setLoading] = useState(true);
   const [showSocialProof, setShowSocialProof] = useState(false);
   const [viewerCount, setViewerCount] = useState(12);
 
@@ -36,7 +35,6 @@ const App: React.FC = () => {
 
   const fetchClinics = async () => {
     try {
-      setLoading(true);
       const { data, error } = await supabase
         .from('clinicas')
         .select('*')
@@ -56,11 +54,7 @@ const App: React.FC = () => {
       }
     } catch (err) {
       console.error('Erro na conexão com Supabase:', err);
-      // Se der erro, usamos os dados iniciais para o site não ficar em branco
       setClinics(INITIAL_CLINICS);
-    } finally {
-      // Garantimos que o loading saia independente de erro
-      setLoading(false);
     }
   };
 
@@ -133,7 +127,7 @@ const App: React.FC = () => {
     <div className="min-h-screen flex flex-col relative">
       {/* Pop-up de Prova Social */}
       <div className={`fixed bottom-6 left-6 z-[100] transition-all duration-700 transform ${showSocialProof ? 'translate-y-0 opacity-100' : 'translate-y-12 opacity-0 pointer-events-none'}`}>
-        <div className="bg-white/95 backdrop-blur-md border border-blue-100 shadow-[0_20px_50px_rgba(0,0,0,0.15)] rounded-2xl p-4 flex items-center space-x-4 max-w-xs">
+        <div className="bg-white/95 backdrop-blur-md border border-blue-100 shadow-[0_20px_50_rgba(0,0,0,0.15)] rounded-2xl p-4 flex items-center space-x-4 max-w-xs">
           <div className="relative">
             <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center text-white shadow-lg shadow-blue-200">
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
@@ -160,11 +154,6 @@ const App: React.FC = () => {
       />
       
       <main className="flex-grow">
-        {loading && (
-          <div className="fixed inset-0 bg-white/50 z-50 flex items-center justify-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-b-4 border-blue-600"></div>
-          </div>
-        )}
         {currentPage === 'home' && <LandingPage onStartBrowsing={() => navigate('catalog')} />}
         {currentPage === 'catalog' && (
           <CatalogPage 

@@ -101,9 +101,6 @@ export const Navbar: React.FC<NavbarProps> = ({ isAdmin, onAdminLogin, currentPa
                     src="/assets/images/Logo.png" 
                     alt="Rei das Clínicas Logo" 
                     className="h-full w-full object-contain"
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).src = 'https://agenciafoxon.com.br/wp-content/uploads/2026/01/Captura-de-tela-2026-01-16-234639.png';
-                    }}
                  />
               </div>
             </div>
@@ -191,9 +188,6 @@ export const Navbar: React.FC<NavbarProps> = ({ isAdmin, onAdminLogin, currentPa
                       src="/assets/images/Logo.png" 
                       alt="Logo" 
                       className="h-10 w-auto mr-3"
-                      onError={(e) => {
-                        (e.target as HTMLImageElement).src = 'https://agenciafoxon.com.br/wp-content/uploads/2026/01/Captura-de-tela-2026-01-16-234639.png';
-                      }}
                     />
                     <div>
                         <h2 className="text-xl font-black text-[#0f172a] tracking-tight">Acesso Administrativo</h2>
