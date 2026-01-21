@@ -17,8 +17,8 @@ export const Navbar: React.FC<NavbarProps> = ({ isAdmin, onAdminLogin, currentPa
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
 
-  // Caminho absoluto com timestamp para evitar cache do navegador se o arquivo foi substituído recentemente
-  const logoUrl = "/assets/images/Logo.png?v=1.0";
+  // URL externa fornecida pelo usuário
+  const logoUrl = "https://agenciafoxon.com.br/assets/images/clientes/reidasclinicas/Logo.png";
 
   const handleWhatsApp = (msg?: string) => {
     const text = msg ? encodeURIComponent(msg) : WHATSAPP_MESSAGE;
@@ -97,13 +97,13 @@ export const Navbar: React.FC<NavbarProps> = ({ isAdmin, onAdminLogin, currentPa
             {/* Centro: Logo */}
             <div className="flex justify-center flex-1">
               <div 
-                className="h-12 lg:h-24 w-auto flex items-center justify-center cursor-pointer transition-transform hover:scale-105" 
+                className="h-14 lg:h-20 w-auto flex items-center justify-center cursor-pointer transition-transform hover:scale-105" 
                 onClick={() => onNavigate('home')}
               >
                  <img 
                     src={logoUrl}
                     alt="Rei das Clínicas" 
-                    className="h-full w-auto max-w-[200px] lg:max-w-[300px] object-contain"
+                    className="h-full w-auto max-w-[200px] lg:max-w-[280px] object-contain"
                     style={{ display: 'block' }}
                  />
               </div>
